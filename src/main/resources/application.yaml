@@ -1,0 +1,20 @@
+# springboot配置
+# Tomcat配置
+server:
+  tomcat:
+    uri-encoding: UTF-8
+    max-threads: 1000
+    min-spare-threads: 30
+  port: 8080
+  connection-timeout: 5000
+  max-http-header-size: 8192
+  servlet:
+    context-path: /shiroDemo
+
+# 加载日志环境
+logging:
+  config: classpath:log4j2-spring-dev.xml
+
+spring:
+  profiles:
+    active: private

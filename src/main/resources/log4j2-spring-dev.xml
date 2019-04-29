@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+
+    <Properties>
+        <!-- 日志输出级别 -->
+        <Property name="LOG_ROOT_LEVEL" value="INFO"/>
+        <!-- 在当前目录下创建名为logs目录做日志存放的目录 -->
+        <Property name="LOG_HOME" value="./logs"/>
+        <!-- 档案日志存放目录 -->
+        <Property name="LOG_ARCHIVE" value="./logs/archive"/>
+        <!-- 模块名称， 影响日志配置名，日志文件名 -->
+        <Property name="LOG_MODULE_NAME" value="shiroDemo"/>
+        <!-- 日志文件大小,超过这个大小将被压缩 -->
+        <Property name="LOG_MAX_SIZE" value="100MB"/>
+        <!-- 保留多少天以内的日志 -->
+        <Property name="LOG_DAYS" value="15"/>
+        <!-- 缓冲队列大小 -->
+        <Property name="INFO_BUFFER_SIZE" value="2048"/>
+        <Property name="ERROR_BUFFER_SIZE" value="256"/>
+        <!--输出日志的格式：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度， %msg：日志消息，%n是换行符 -->
+        <Property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{0} - %msg%n"/>
+        <!--interval属性用来指定多久滚动一次，默认是1 hour-->
+        <Property name="TIME_BASED_INTERVAL" value="1"/>
+    </Properties>
+
+    <Appenders>
+        <!-- 控制台输出 -->
+        <Console name="STDOUT" target="SYSTEM_OUT">
+            <!--输出日志的格式-->
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <!--控制台只输出level及其以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
+            <ThresholdFilter level="${LOG_ROOT_LEVEL}" onMatch="ACCEPT" onMismatch="DENY"/>
+        </Console>
+
+        <!-- 这个会打印出所有的info及以上级别的信息，每次大小超过size，则这size大小的日志会自动存入按年份-月份建立的文件夹下面并进行压缩，作为存档-->
+        <RollingFile name="RollingFileInfo" fileName="${LOG_HOME}/${LOG_MODULE_NAME}-infoLog.log"
+                     filePattern="${LOG_ARCHIVE}/${LOG_MODULE_NAME}-infoLog-%d{yyyy-MM-dd}-%i.log.gz">
+            <!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
+            <ThresholdFilter level="${LOG_ROOT_LEVEL}" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <!--interval属性用来指定多久滚动一次，默认是1 hour-->
+                <TimeBasedTriggeringPolicy interval="${TIME_BASED_INTERVAL}"/>
+                <SizeBasedTriggeringPolicy size="${LOG_MAX_SIZE}"/>
+            </Policies>
+            <!-- DefaultRolloverStrategy属性如不设置，则默认为最多同一文件夹下7个文件开始覆盖-->
+            <DefaultRolloverStrategy max="${LOG_DAYS}"/>
+        </RollingFile>
+
+        <!-- 这个会打印出所有的error及以上级别的信息，每次大小超过size，则这size大小的日志会自动存入按年份-月份建立的文件夹下面并进行压缩，作为存档-->
+        <RollingFile name="RollingFileError" fileName="${LOG_HOME}/${LOG_MODULE_NAME}-errorLog.log"
+                     filePattern="${LOG_ARCHIVE}/${LOG_MODULE_NAME}-errorLog-%d{yyyy-MM-dd}-%i.log.gz">
+            <!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
+            <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <!--interval属性用来指定多久滚动一次，默认是1 hour-->
+                <TimeBasedTriggeringPolicy interval="${TIME_BASED_INTERVAL}"/>
+                <SizeBasedTriggeringPolicy size="${LOG_MAX_SIZE}"/>
+            </Policies>
+            <!-- DefaultRolloverStrategy属性如不设置，则默认为最多同一文件夹下7个文件开始覆盖-->
+            <DefaultRolloverStrategy max="${LOG_DAYS}"/>
+        </RollingFile>
+
+        <!-- 异步记录日志 -->
+        <Async name="Async-RollingFileInfo" bufferSize="${INFO_BUFFER_SIZE}">
+            <AppenderRef ref="RollingFileInfo"/>
+        </Async>
+        <Async name="Async-RollingFileError" bufferSize="${ERROR_BUFFER_SIZE}">
+            <AppenderRef ref="RollingFileError"/>
+        </Async>
+    </Appenders>
+
+    <Loggers>
+        <!-- 测试使用 -->
+        <Root level="${LOG_ROOT_LEVEL}">
+            <AppenderRef ref="STDOUT"/>
+        </Root>
+
+        <!-- 正式发布 -->
+        <!--<Root level="${LOG_ROOT_LEVEL}">
+            <AppenderRef ref="Async-RollingFileInfo"/>
+            <AppenderRef ref="Async-RollingFileError"/>
+        </Root>-->
+    </Loggers>
+
+</Configuration>
