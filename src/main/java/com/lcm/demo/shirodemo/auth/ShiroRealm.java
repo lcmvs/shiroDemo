@@ -1,12 +1,10 @@
 package com.lcm.demo.shirodemo.auth;
 
+import com.lcm.demo.shirodemo.common.constant.RedisKey;
 import com.lcm.demo.shirodemo.module.dao.SysPermissionDao;
 import com.lcm.demo.shirodemo.module.dao.SysUserDao;
 import com.lcm.demo.shirodemo.module.dao.entity.SysUser;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.AuthenticationInfo;
-import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
@@ -45,16 +43,30 @@ public class ShiroRealm extends AuthorizingRealm {
         return token instanceof OAuth2Token;
     }
 
+    /**
+     * 认证：登录验证，验证token
+     * @param authenticationToken
+     * @return
+     * @throws AuthenticationException
+     */
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
         String token=(String) authenticationToken.getPrincipal();
-        String id=stringRedisTemplate.opsForValue().get(token);
+        String id=stringRedisTemplate.opsForValue().get(RedisKey.SHIRO_TOKEN+token);
         Optional<SysUser> user = sysUserDao.findById(Long.valueOf(id));
+        if (user.get()==null){
+            throw new IncorrectCredentialsException("token失效，请重新登录");
+        }
         SimpleAuthenticationInfo info=new SimpleAuthenticationInfo(user.get(),token,getName());
         return info;
     }
 
 
+    /**
+     * 授权：权限验证，检查权限
+     * @param principalCollection
+     * @return
+     */
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
         SysUser user=(SysUser)principalCollection.getPrimaryPrincipal();

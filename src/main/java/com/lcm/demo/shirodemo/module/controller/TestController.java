@@ -6,6 +6,7 @@ import com.lcm.demo.shirodemo.common.util.TokenUtil;
 import com.lcm.demo.shirodemo.module.controller.requestBody.LoginBody;
 import com.lcm.demo.shirodemo.module.dao.entity.SysUser;
 import com.lcm.demo.shirodemo.module.service.TestService;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.validation.annotation.Validated;
@@ -22,7 +23,7 @@ import java.util.concurrent.TimeUnit;
  * @create: 2019-04-26 17:07
  **/
 @RestController
-public class TestController {
+public class TestController extends AbstractCommonController {
 
     @Autowired
     StringRedisTemplate stringRedisTemplate;
@@ -36,14 +37,23 @@ public class TestController {
         if (user==null){
             return Result.error("账号密码错误！");
         }
-        String token= TokenUtil.getToken(user.getUserId());
-        stringRedisTemplate.opsForValue().set(token,user.getUserId()+"", Constant.TOKEN_TIMEOUT, TimeUnit.SECONDS);
+        String token= TokenUtil.createToken(user.getUserId());
+
+        createToken(user.getUserId(),token);
+
         return Result.ok().put("token",token);
     }
 
+    @RequiresPermissions("test")
     @PostMapping("/test")
     public Result test(){
         return Result.ok("test");
+    }
+
+    @RequiresPermissions("hehe")
+    @PostMapping("/hehe")
+    public Result hehe(){
+        return Result.ok("hehe");
     }
 
 }

@@ -19,13 +19,13 @@ public class TokenUtil {
      * @param id
      * @return
      */
-    public static String getToken(Long id){
+    public static String createToken(Long id){
         String str=UUID.randomUUID()+SALT+id;
         return DigestUtils.md5DigestAsHex(str.getBytes());
     }
 
     public static void main(String[] args){
-        System.out.println(getToken(1L));
+        System.out.println(createToken(1L));
     }
 
 }

@@ -4,6 +4,7 @@ package com.lcm.demo.shirodemo.common.exception;
 import com.lcm.demo.shirodemo.common.constant.Constant;
 import com.lcm.demo.shirodemo.common.util.Result;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.authz.AuthorizationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -20,6 +21,18 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    /**
+     * Description: 没有权限异常
+     *
+     * @param e
+     * @return
+     */
+    @ExceptionHandler(AuthorizationException.class)
+    public Result handleAuthorizationException(AuthorizationException e) {
+        log.error(e.getMessage(), e);
+        return Result.error("没有权限，请联系管理员授权");
+    }
 
     /**
      * Description: 处理自定义异常
