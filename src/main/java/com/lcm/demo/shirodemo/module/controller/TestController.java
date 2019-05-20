@@ -25,25 +25,6 @@ import java.util.concurrent.TimeUnit;
 @RestController
 public class TestController extends AbstractCommonController {
 
-    @Autowired
-    StringRedisTemplate stringRedisTemplate;
-
-    @Autowired
-    TestService testService;
-
-    @PostMapping("/login")
-    public Result login(@Validated @RequestBody() LoginBody body){
-        SysUser user = testService.login(body.getUsername(),body.getPassword() );
-        if (user==null){
-            return Result.error("账号密码错误！");
-        }
-        String token= TokenUtil.createToken(user.getUserId());
-
-        createToken(user.getUserId(),token);
-
-        return Result.ok().put("token",token);
-    }
-
     @RequiresPermissions("test")
     @PostMapping("/test")
     public Result test(){

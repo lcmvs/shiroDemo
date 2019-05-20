@@ -24,7 +24,8 @@ import java.io.IOException;
 public class OAuth2Filter extends AuthenticatingFilter {
 
     @Override
-    protected AuthenticationToken createToken(ServletRequest servletRequest, ServletResponse servletResponse) throws Exception {
+    protected AuthenticationToken createToken(ServletRequest servletRequest, ServletResponse servletResponse)
+            throws Exception {
 
         String token=getToken((HttpServletRequest) servletRequest);
         if (StringUtils.isBlank(token)){
@@ -35,7 +36,8 @@ public class OAuth2Filter extends AuthenticatingFilter {
     }
 
     @Override
-    protected boolean onAccessDenied(ServletRequest servletRequest, ServletResponse servletResponse) throws Exception {
+    protected boolean onAccessDenied(ServletRequest servletRequest, ServletResponse servletResponse)
+            throws Exception {
         String token = getToken((HttpServletRequest) servletRequest);
         if (StringUtils.isBlank(token)) {
             HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
@@ -60,7 +62,8 @@ public class OAuth2Filter extends AuthenticatingFilter {
      * @return
      */
     @Override
-    protected boolean onLoginFailure(AuthenticationToken token, AuthenticationException e, ServletRequest request, ServletResponse response) {
+    protected boolean onLoginFailure(AuthenticationToken token, AuthenticationException e,
+                                     ServletRequest request, ServletResponse response) {
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         httpResponse.setContentType("application/json;charset=utf-8");
         httpResponse.setHeader("Access-Control-Allow-Credentials", "true");

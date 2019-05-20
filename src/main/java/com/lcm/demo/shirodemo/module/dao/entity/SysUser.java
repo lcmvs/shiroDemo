@@ -8,6 +8,9 @@ import javax.persistence.Transient;
 import java.util.Date;
 import java.util.Set;
 
+/**
+ * @author lcm
+ */
 @Entity
 @Data
 public class SysUser {
@@ -19,7 +22,11 @@ public class SysUser {
 
     private String username;
 
+    private String salt;
+
     private String password;
+
+    private String phone;
 
     private Byte status;
 
